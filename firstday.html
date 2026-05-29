@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RESHAPE</title>
+    <style>
+        body {
+            font-family: "微软雅黑", Arial, sans-serif;
+            background-color: #6c6c97;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .text-link {
+            color: #ffffffef;
+            font-size: 18px;
+            background-color: #6eb990;
+            padding: 10px 20px; 
+            border-radius: 999px; 
+            margin: 0;
+            text-align: center; 
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+            gap: 20px;
+            transition: transform 0.2s ease;
+        }
+        /*鼠标悬停放大*/
+        .text-link:hover {
+            transform: scale(1.05);
+        }   
+        .carousel-img{
+            width: 500px;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.2s ease,opacity 0.3s ease;
+            opacity: 1;
+        }
+        .carousel-img:hover {
+            transform: scale(1.05);
+        }
+        .poem-btn{
+            position: fixed;
+            right: 100px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #d1aae0;
+            color:white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .poem-btn:hover{
+            background-color: #8e44ad
+        }
+        .poem-container {
+            width: 80%;
+            max-width: 600px;
+            margin-top: 60px;
+            line-height: 1.8;
+            text-align: center;
+            color:white;
+            font-size: 22px;
+            min-height: 100px;
+        }
+        /* 单个字符动画 */
+        .poem-char{
+            color: aliceblue;
+            display: inline-block;
+            opacity: 0; /*初始隐藏*/
+            transition: all 0.5 ease; /* 过渡动画，所有变化0.5秒平滑 */
+        }
+    </style>
+</head>
+<body>
+    <audio id="yiyangdeyueguang" src="zpc-yiyangdeyueguang.mp3" preload="auto"></audio>
+    <img id="carousel" class="carousel-img" src="./img/zpc3.jpg" alt="轮播图片">
+
+    <a class="text-link" onclick="playMusic()">I'm slowly stepping away from my old life！</a>    
+    <button class="poem-btn" onclick="showPoem()">落下</button>
+    <!-- 诗歌存放容器 -->
+    <div id = "poem-container"></div>
+    <script>
+        // 图片轮播
+        const images = [
+            './img/zpc1.jpg',
+            './img/zpc2.jpg',
+            './img/zpc3.jpg',
+        ];
+        let currentIndex = 0;
+        const carouselImg = document.getElementById('carousel');
+        carouselImg.addEventListener('click',() => {
+            currentIndex = (currentIndex + 1) % images.length;
+            carouselImg.src = images[currentIndex];
+        });
+        // 音乐播放器
+        const audio = document.getElementById('yiyangdeyueguang');
+        audio.onended = function() {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+        function playMusic() {
+            if(audio.paused){
+                audio.play();
+            }else{
+                audio.pause();
+            }
+            }
+        // 诗歌动画
+        const poem = `一样的月光
+        怎么看的我越来越心慌
+        你留下最清楚的步伐
+        竟是指引我孤单的方向
+        `; //反引号支持文本自动换行
+        
+        let poemShown = false;
+
+        function showPoem() {
+            const container = document.getElementById('poem-container');
+             // 判断：如果诗歌已经显示，再次点击就清空内容
+            if (poemShown) {
+                container.innerHTML = ''; // 清空盒子里所有内容
+                poemShown = false; // 修改状态为「未展示」
+                return; // 终止当前函数，不再执行后续代码
+            }
+            // 走到这里 = 诗歌未展示，开始生成文字
+            poemShown = true;
+            container.innerHTML = ''; // 先清空残留内容
+            // 遍历诗歌字符串的每个字符
+            for(let i = 0; i < poem.length; i++) {
+                //取出第i个字符
+                const char = poem[i];
+                const dispalyChar = char === '\n' ? '\u00A0\u00A0' : char; // 保留换行符
+                // 动态创建一个 span 标签（用来包裹单个文字）
+                const span = document.createElement('span'); 
+                span.className = 'poem-char'; // 给span绑定动画样式类
+                span.textContent = dispalyChar ; // 赋值文字内容，保留诗歌原有换行
+                container.appendChild(span); // 把span添加到容器里
+                // 设置一个定时器，让每个字符依次出现
+                setTimeout(() => {
+                    span.style.opacity = '1'; // 让字符变得可见
+                    span.style.transform = 'translateY(0)'; // 让字符回到正常位置
+                }, i * 200); // 每个字符间隔200毫秒出现
+            }
+
+
+}
+    </script>
+    <!--h1 class="ellipse-title">I'm slowly stepping away from my old life！</h1>-->
+    <!--<iframe 
+        frameborder="no" 
+        marginwidth="0" 
+        marginheight="0" 
+        width="330" 
+        height="86" 
+        src="https://i.y.qq.com/n2/m/outchain/player/index.html?songid=667990920&amp;songtype=0">
+    </iframe>-->
+</body>
+</html>
